@@ -1,0 +1,42 @@
+.contextMenu {
+    position        : fixed;
+    z-index         : 10;
+    display         : none;
+    border-radius   : 5px;
+    // border: 1px solid;
+    box-shadow      : 0 0 2px var(--second-color);
+    background-color: var(--back-color);
+    color           : var(--font-color);
+    padding         : 2px;
+    box-sizing      : border-box;
+    font-size       : 13px;
+    z-index: 1001;
+
+    .ant-menu {
+        background-color: inherit;
+        color: inherit;
+        font-size: inherit;
+
+        &.ant-menu-vertical {
+            border: none;
+        }
+        .ant-menu-item {
+            height: 24px;
+            line-height: 24px;
+        }
+        .ant-menu-item-selected, .ant-menu-item-disabled {
+            color: inherit;
+            background-color: inherit;
+        }
+        .ant-menu-item-disabled {
+            color: rgba($color: #ccc, $alpha: 0.6) !important;
+        }
+        .ant-menu-item-active {
+            color: var(--main-color);
+            background-color: rgba($color: gray, $alpha: 0.2);
+        }
+        .ant-menu-item-divider {
+            border: 0.5px solid var(--second-color-trans);
+        }
+    }
+}

@@ -1,0 +1,37 @@
+.inform {
+    padding   : 0 30px;
+    min-height: calc(100% - 40px);
+
+    .ant-switch-checked:focus {
+        box-shadow: none;
+    }
+
+    .item {
+        display        : flex;
+        justify-content: space-between;
+        width          : 100%;
+        padding        : 15px 10px;
+        border-bottom  : solid 1px var(--second-color);
+        font-size      : 16px;
+
+
+        &:nth-last-child(1) {
+            border-bottom: none;
+        }
+
+        span {
+            // position: relative;
+            vertical-align: baseline;
+
+            .tip {
+                margin-left   : 3px;
+                font-size     : 13px;
+                // line-height: 13px;
+                // display: inline-block;
+                // top: 0;
+                // position: absolute;
+            }
+        }
+    }
+
+}

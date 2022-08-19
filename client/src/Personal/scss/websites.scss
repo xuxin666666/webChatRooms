@@ -1,0 +1,31 @@
+.websites {
+    .description {
+        display        : flex;
+        flex-direction: column;
+        align-items: center;
+
+        .item {
+            width: 200px;
+            display: flex;
+            align-items: center;
+            // justify-content: center;
+            margin: 10px 0;
+            font-size: 16px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                color: var(--main-color);
+                transform: scale(1.03);
+            }
+
+            .icon {
+                font-size: 18px;
+            }
+
+            .out-link {
+                margin-left: 10px;
+                width: 100%;
+            }
+        }
+    }
+}

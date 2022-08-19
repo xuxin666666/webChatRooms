@@ -1,0 +1,62 @@
+.dark-theme {
+    --font-color  : white;
+    --main-color  : #c353fa;
+    --second-color: #ffeba7;
+    --second-color-trans: rgba(255, 235, 167, 0.5);
+    --back-color  : #2a2b38;
+    --back-color2 : #1f2029;
+    --back-light: #fcfcfcbb;
+    --back-dark: #bfbfbfb6;
+}
+
+.light-theme {
+    --font-color  : black;
+    --main-color  : #00c3ff;
+    --second-color: #2d74cc;
+    --second-color-trans: rgba(45, 116, 204, 0.5);
+    --back-color  : #e6f7ff;
+    --back-color2 : #f0f1f5;
+    --back-image  : url('./assert/images/bgImg.png');
+    --back-light: rgb(217,235,255);
+    --back-dark: rgb(0,122,255);
+}
+
+
+$msgFontSize: 16px;
+$msgMinWidth: 120px;
+
+.msgSuccess {
+    .ant-message-notice-content {
+        background-color: rgb(240, 249, 235);
+        color           : rgb(103, 194, 58) !important;
+        min-width       : $msgMinWidth;
+        font-size       : $msgFontSize;
+    }
+}
+
+.msgWarning {
+    .ant-message-notice-content {
+        background-color: rgb(253, 246, 236);
+        color           : rgb(230, 162, 60) !important;
+        min-width       : $msgMinWidth;
+        font-size       : $msgFontSize;
+    }
+}
+
+.msgInfo {
+    .ant-message-notice-content {
+        background-color: rgb(237, 242, 252);
+        color           : rgb(144, 147, 153) !important;
+        min-width       : $msgMinWidth;
+        font-size       : $msgFontSize;
+    }
+}
+
+.msgError {
+    .ant-message-notice-content {
+        background-color: rgb(254, 240, 240);
+        color           : rgb(245, 108, 108) !important;
+        min-width       : $msgMinWidth;
+        font-size       : $msgFontSize;
+    }
+}

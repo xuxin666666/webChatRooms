@@ -1,0 +1,5 @@
+127.0.0.1 - - [13/Apr/2022:01:48:59 +0000] "GET / HTTP/1.1" 401 53 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
+127.0.0.1 - - [13/Apr/2022:01:48:59 +0000] "GET /favicon.ico HTTP/1.1" 401 53 "http://127.0.0.1:8080/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.88 Safari/537.36"
+127.0.0.1 - - [13/Apr/2022:01:50:12 +0000] "GET /hello HTTP/1.1" 401 53 "-" "PostmanRuntime/7.26.8"
+127.0.0.1 - - [13/Apr/2022:01:50:45 +0000] "GET /hello HTTP/1.1" 401 53 "-" "PostmanRuntime/7.26.8"
+127.0.0.1 - - [13/Apr/2022:01:52:00 +0000] "GET /hello HTTP/1.1" 200 29 "-" "PostmanRuntime/7.26.8"

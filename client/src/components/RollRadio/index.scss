@@ -1,0 +1,42 @@
+@import '../../index.scss';
+
+.roll-radio {
+    position        : relative;
+    min-width       : 30px;
+    height          : 16px;
+    width           : 60px;
+    border-radius   : 8px;
+    cursor          : pointer;
+    // background-color: $secondColor;
+    background-color: var(--second-color);
+    margin          : 10px auto;
+    display         : block;
+    user-select     : none;
+
+    div {
+        position        : absolute;
+        top             : -10px;
+        left            : -10px;
+        width           : 36px;
+        height          : 36px;
+        line-height     : 36px;
+        font-size       : 24px;
+        font-weight     : 800;
+        text-align      : center;
+        border-radius   : 50%;
+        // color           : $secondColor;
+        color: var(--second-color);
+        // background-color: $mainColor;
+        background-color: var(--main-color);
+        transform-origin: center;
+    }
+}
+
+.roll-radio-roll {
+    div {
+        transform: rotate(-270deg);
+        left     : calc(100% - 26px);
+        // right: -10px;
+        // left:auto;
+    }
+}

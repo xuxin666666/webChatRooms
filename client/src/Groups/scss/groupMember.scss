@@ -1,0 +1,59 @@
+.groupMember {
+
+    .member {
+        height: 50px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--second-color);
+        box-sizing: border-box;
+        
+        padding: 5px;
+
+        &:last-child {
+            border: none;
+        }
+        .avatar {
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .memberName {
+            cursor: pointer;
+        }
+        .kickOut {
+            display: none;
+            // visibility: hidden;
+            &:hover {
+                background-color: var(--back-color2);
+                opacity: 0.8;
+            }
+            &:focus {
+                background-color: var(--back-color2);
+            }
+        }
+        &:hover {
+            background-color: rgba($color: gray, $alpha: 0.2);
+            .kickOut {
+                // visibility: visible;
+                display: block;
+            }
+        }
+    }
+}
+
+.membersPopComfirm {
+    button.ant-btn {
+        background-color: var(--back-color);
+        &:focus, &:hover, &.ant-btn-primary {
+            color: #40a9ff;
+            border-color: var(--second-color);
+            // background: #fff;
+        }
+        &:hover {
+            opacity: 0.9;
+            color: var(--main-color) !important;
+        }
+    }
+}

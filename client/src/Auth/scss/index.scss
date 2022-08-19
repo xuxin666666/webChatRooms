@@ -1,0 +1,53 @@
+.auth {
+    position   : absolute;
+    top        : 50%;
+    left       : 50%;
+    transform  : translate(-50%, -50%);
+    user-select: none;
+
+    .l-and-r {
+        text-align : center;
+        user-select: none;
+
+        // margin: 20px 0;
+        span {
+            margin     : 0 20px;
+            font-size  : 1.2rem;
+            font-weight: 800;
+            cursor     : pointer;
+        }
+    }
+
+    .login {
+        .blocked {
+            margin-top: -12px;
+            margin-bottom: 12px;
+            text-align: center;
+            color     : red;
+            font-size : 14px;
+        }
+    }
+
+    .submit {
+        background-color: var(--second-color);
+        font-size       : 16px;
+        font-weight     : 600;
+        line-height     : 100%;
+
+        * {
+            color: var(--main-color) !important;
+        }
+    }
+
+    .register {
+        .send-code {
+            width: 100%;
+
+            span {
+                color: var(--main-color);
+            }
+
+            background-color: var(--second-color);
+        }
+    }
+}
