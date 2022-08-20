@@ -18,6 +18,10 @@
 /build
 /dist
 
+*.rar
+*.zip
+*.txt
+
 # config
 /server/src/config/*.json
 
