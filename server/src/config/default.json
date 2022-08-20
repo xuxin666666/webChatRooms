@@ -1,9 +1,0 @@
-{
-    "version": "1.0.0",
-    "server": {
-        "hostname": "127.0.0.1",
-        "port": 8080
-    },
-    "client": "http://localhost:3000",
-    "env": "development"
-}
