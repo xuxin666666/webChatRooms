@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import { Button, Space, Tag, Popconfirm, Modal } from 'antd'
 import type { PopconfirmProps, MenuProps } from 'antd'
@@ -134,7 +134,8 @@ const GroupMember: React.FC<{gid?: string}> = ({ gid }) => {
 
     return (
         <div className='groupMember'>
-            <ContextMenu items={items}>
+            <ContextMenu>
+                <ContextMenu.ContextMenu items={items} />
                 {members.map((member, index) => (
                     <ContextMenu.Item key={member.uid} disabled={member.uid === userInfo.uid}>
                         <div className='member' onContextMenu={() => setOperating(member)}>

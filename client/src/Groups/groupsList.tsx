@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { List, Badge, Modal, Drawer } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -34,10 +34,10 @@ const GroupsList: React.FC<{
 
     let navigate = useNavigate()
 
-    const [operating, setOperating] = useState<Group>() // 右键正在操作的群
     // const [disabled, setDisabled] = useState(false)
     const [drawerVis, setDrawerVis] = useState(false)
 
+    const operating = useRef<Group>() // 右键正在操作的群
 
     const getGroupList = useCallback(() => {
         axios.get('/group/getGroup').then(({ data }) => {
@@ -87,7 +87,7 @@ const GroupsList: React.FC<{
 
 
     const copyGroupID = () => {
-        window.navigator.clipboard.writeText(operating!.id.toString()).then(() => {
+        window.navigator.clipboard.writeText(operating.current!.id.toString()).then(() => {
             message.success('复制成功')
         }).catch(err => {
             message.error('复制失败')
@@ -103,7 +103,7 @@ const GroupsList: React.FC<{
             title: '确认解散该群？',
             maskClosable: true,
             onOk: () => {
-                socket.emit('dissolve group', operating?.gid, (err: any) => {
+                socket.emit('dissolve group', operating.current?.gid, (err: any) => {
                     console.log(err)
                     if(!err) {
                         message.success('解散群聊成功')
@@ -118,23 +118,19 @@ const GroupsList: React.FC<{
 
     const groupContextMenu = useCallback((e: React.MouseEvent, group: Group) => {
         e.preventDefault();
-
-        // menuRef.current.style.left = e.pageX + 'px'
-        // menuRef.current.style.top = e.pageY + 'px'
-        // setMenuShow(true)
-        setOperating(group)
+        operating.current = group
     }, [])
 
-
-
+    
     return (
         <div className='group-list' id='group-list'>
-            <ContextMenu items={[
-                { key: 0, label: '复制群id', onClick: copyGroupID },
-                { type: 'divider' },
-                { key: 1, label: '查看群成员', onClick: lookMembers },
-                { key: 2, label: '解散该群', onClick: dissolveGroup }
-            ]}>
+            <ContextMenu>
+                <ContextMenu.ContextMenu items={[
+                    { key: 0, label: '复制群id', onClick: copyGroupID },
+                    { type: 'divider' },
+                    { key: 1, label: '查看群成员', onClick: lookMembers },
+                    { key: 2, label: '解散该群', onClick: dissolveGroup }
+                ]} />
                 <List
                     dataSource={groups}
                     renderItem={item => (
@@ -158,9 +154,8 @@ const GroupsList: React.FC<{
             </ContextMenu>
 
             <Drawer title="所有群成员" placement="right" visible={drawerVis} onClose={() => setDrawerVis(false)} className='drawer'>
-                <GroupMember gid={operating?.gid} />
+                <GroupMember gid={operating.current?.gid} />
             </Drawer>
-            {/* {menu} */}
         </div>
     )
 }

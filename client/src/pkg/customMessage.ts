@@ -55,7 +55,7 @@ const customMessage: CusTomMessage = {
         }
         message.open({
             type: 'info',
-            className: 'msgSuccess',
+            className: 'msgInfo',
             content: content,
             duration: duration || 2,
             key: key
@@ -68,7 +68,7 @@ const customMessage: CusTomMessage = {
         }
         message.open({
             type: 'warning',
-            className: 'msgSuccess',
+            className: 'msgWarning',
             content: content,
             duration: duration || 2,
             key: key
@@ -81,7 +81,7 @@ const customMessage: CusTomMessage = {
         }
         message.open({
             type: 'error',
-            className: 'msgSuccess',
+            className: 'msgError',
             content: content,
             duration: duration || 2,
             key: key
