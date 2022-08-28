@@ -109,7 +109,7 @@ const CreateGroup: React.FC<{
                         validateTrigger='onBlur'
                     >
                         <Input.TextArea
-                            maxLength={1000}
+                            maxLength={300}
                             autoSize={{ minRows: 6, maxRows: 6 }}
                         />
                     </Form.Item>

@@ -23,7 +23,8 @@ const USER_DELETE = 'user_delete',
     GROUP_DELETE = 'group_delete',
     GROUP_SET_OWNER = 'group_set_owner',
     GROUP_SET_ADMIN = 'group_set_admin',
-    GROUP_KICK_MEMBER = 'group_kick_member'
+    GROUP_KICK_MEMBER = 'group_kick_member',
+    GROUP_SET_INFO = 'group_set_info'
 
 
 interface Permissions {
@@ -36,6 +37,7 @@ interface Permissions {
     GROUP_SET_OWNER?: string
     GROUP_SET_ADMIN?: string
     GROUP_KICK_MEMBER?: string
+    GROUP_SET_INFO?: string
 }
 
 const User: {
@@ -62,11 +64,11 @@ const GROUP: {
 } = {
     owner: {
         LEVEL: 3,
-        GROUP_DELETE, GROUP_SET_OWNER, GROUP_SET_ADMIN, GROUP_KICK_MEMBER
+        GROUP_DELETE, GROUP_SET_OWNER, GROUP_SET_ADMIN, GROUP_KICK_MEMBER, GROUP_SET_INFO
     },
     admin: {
         LEVEL: 2,
-        GROUP_KICK_MEMBER
+        GROUP_KICK_MEMBER, GROUP_SET_INFO
     },
     normal: {
         LEVEL: 1

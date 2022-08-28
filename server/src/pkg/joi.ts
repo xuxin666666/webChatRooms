@@ -89,7 +89,7 @@ const schema = {
         groupname: Joi.string().min(2).max(20)
     }),
     description: Joi.object({
-        description: Joi.string().max(1000)
+        description: Joi.string().max(300)
     }),
 }
 const validate = (type: ValidateType, data: any) => {

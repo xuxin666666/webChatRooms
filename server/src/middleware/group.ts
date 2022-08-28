@@ -31,6 +31,9 @@ export const isGroupOwner = async (req: Request, res: Response, next: NextFuncti
     try {
         let gid = req.body.gid, uid = res.locals.uid
 
+        if(!gid || !uid) return res.status(412).end()
+
+        console.log(gid, uid)
         mysql.GGetGroupInfo({ gid: gid }).then((groups) => {
             let group = groups[0]
             if (uid === group.owner) {
@@ -46,6 +49,7 @@ export const isGroupOwner = async (req: Request, res: Response, next: NextFuncti
             })
         })
     } catch (err) {
+        console.log(err)
         res.status(500).end()
     }
 }
@@ -57,6 +61,7 @@ export const groupSocket = (socket: Socket) => async (packet: Event, next: (err?
     if (ev === 'dissolve group') {
         let gid = packet[1] as string
 
+        // 管理员
         let able = (await PERMISSION.getUserPermissionsByID(uid)).GROUP_DELETE
         if(!able) {
             let isMember = await mysql.GIsGroupMember(gid, uid)
@@ -69,6 +74,7 @@ export const groupSocket = (socket: Socket) => async (packet: Event, next: (err?
                 return next(err)
             }
 
+            // 群主
             able = (await PERMISSION.getGroupPermissionsByID(gid, uid)).GROUP_DELETE
             if(!able) {
                 let err = new Error('解散群聊：权限不够，uid:' + uid + ' gid:' + gid)

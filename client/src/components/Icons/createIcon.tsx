@@ -3,6 +3,7 @@ import Icon from '@ant-design/icons'
 
 export interface IconOutlined {
     className?: string
+    onClick?: React.MouseEventHandler
     [key: string]: any
 }
 

@@ -212,18 +212,19 @@ const GGetGroupInfo = (conditions: GroupGetGroups) => new Promise<GroupSqlInfo[]
     let key: keyof GroupGetGroups
 
     let sql = 'select * from `groups` where '
-    let selectArr = [], values = Object.values(conditions)
+    let selectArr = [], values: any[] = []
 
     for (key in conditions) {
         if (conditions[key] !== undefined && conditions[key] !== null)
             selectArr.push(`\`${key}\` = ?`)
+            values.push(conditions[key])
     }
     sql += selectArr.join(' and ')
 
     connPool.execute(sql, values).then(([groups]) => {
         resolve((groups as GroupSqlInfo[]))
     }).catch(err => {
-        console.logger('GGetGroup', err)
+        console.logger('GGetGroupInfo', err)
         reject(err)
     })
 })
@@ -297,11 +298,12 @@ const GChangeGroupInfo = (gid: string, info: GroupChangeInfo) => new Promise((
     // 拼接修改命令
     let key: keyof GroupChangeInfo
     let sql = 'update `groups` set '
-    let selectArr = [], values = Object.values(info)
+    let selectArr = [], values: any[] = []
 
     for (key in info) {
         if (info[key] !== undefined && info[key] !== null) {
             selectArr.push(`\`${key}\` = ?`)
+            values.push(info[key])
         }
     }
     if (!selectArr.length) return resolve({})

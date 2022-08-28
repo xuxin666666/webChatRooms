@@ -3,6 +3,12 @@ import { WritableDraft } from "immer/dist/internal";
 import { Socket } from "socket.io-client";
 
 
+
+export interface GroupChangeInfo {
+    avatar?: string
+    owner?: number
+    name?: string
+}
 export interface Group {
     id: number
     gid: string
@@ -112,11 +118,22 @@ export const groupSlice = createSlice({
                     state.groups[i].read = true
                 }
             }
+        },
+        changeGroupInfo(state, action: PayloadAction<{gid: string, info: GroupChangeInfo}>) {
+            let group: any = state.groups.find(group => group.gid === action.payload.gid)
+
+            // if(group) group.owner = action.payload.info.owner
+            let key: keyof GroupChangeInfo
+            if(group) {
+                for(key in action.payload.info) {
+                    group[key] = action.payload.info[key]
+                }
+            }
         }
     }
 })
 
-export const { setSocket, addGroup, resetIndex, receivedNewMessage, beginConnect, clearTimer, setTimer, setCurrent, removeGroup } = groupSlice.actions
+export const { setSocket, addGroup, resetIndex, receivedNewMessage, beginConnect, clearTimer, setTimer, setCurrent, removeGroup, changeGroupInfo } = groupSlice.actions
 
 
 export default groupSlice.reducer

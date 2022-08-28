@@ -19,6 +19,21 @@ body>* {
 }
 
 
+input.ant-input.input, textarea.ant-input.input {
+    color     : var(--font-color);
+    box-shadow: 0 0 0 1000px var(--back-color2) inset;
+
+    &:focus {
+        box-shadow: 0 0 0 1000px var(--back-color2) inset !important;
+    }
+
+    &:-webkit-autofill {
+        -webkit-text-fill-color: var(--font-color);
+    }
+}
+
+
+
 .btn.ant-btn, .button.ant-btn {
     color: var(--font-color);
     background-color: var(--back-color2);

@@ -7,7 +7,7 @@ import http from 'http'
 
 import cors from '../middleware/cors'
 import { authHttp } from '../middleware/auth'
-import { isGroupExist, isGroupOwner, } from '../middleware/group'
+import { isGroupExist, isGroupOwner } from '../middleware/group'
 import { morganLogSetUp } from '../log'
 import '../pkg/file'
 
@@ -93,12 +93,13 @@ function routers(app: Express) {
         group.use(authHttp)
         group.get('/getMessages', isGroupExist, controller.GGetMessages)
         group.get('/getGroup', controller.GGetGroups)
+        group.get('/', controller.GGetGroupInfo)
         group.get('/search', controller.GSearchGroup)
         group.get('/members', isGroupExist, controller.GGetMembers)
         group.post('/', controller.GCreateGroup)
         group.post('/changeRole', controller.GChangeMemberRole)
-        group.post('/avatar', isGroupOwner, controller.GChangeAvatar)
-        group.post('/changeInfo', isGroupOwner, controller.GChangeBasicInfos)
+        group.post('/avatar', controller.GChangeAvatar)
+        group.post('/changeInfo', controller.GChangeBasicInfos)
         group.post('/join', controller.GJoinGroup)
         group.delete('/', controller.GDeleteGroup)
     }

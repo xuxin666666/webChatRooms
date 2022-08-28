@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 import ContextMenu from '../components/ContextMenu'
-import GroupMember from './groupMember'
+import GroupMemberContainer from './container/groupMemberContainer'
+import GroupInfoContainer from './container/groupInfoContainer'
 import Image from '../components/Image'
+import { useUserInfo } from '../hooks'
 import { message } from '../pkg';
-import type {States, Dispatches} from './container/groupListContainer'
+import type { States, Dispatches } from './container/groupListContainer'
 
 import './scss/groupsList.scss'
 
@@ -33,9 +35,11 @@ const GroupsList: React.FC<{
     const { groups, socket, current } = groupState
 
     let navigate = useNavigate()
+    const userInfo = useUserInfo()
 
     // const [disabled, setDisabled] = useState(false)
-    const [drawerVis, setDrawerVis] = useState(false)
+    const [memberVis, setMemberVis] = useState(false)
+    const [infoVis, setInfoVis] = useState(false)
 
     const operating = useRef<Group>() // 右键正在操作的群
 
@@ -51,10 +55,10 @@ const GroupsList: React.FC<{
     }, [beginConnect])
 
     useEffect(() => {
-        if(!socket) return
+        if (!socket) return
 
         getGroupList()
-        
+
         function newMessage(_: any, gid: string) {
             receivedNewMessage(gid)
         }
@@ -79,9 +83,9 @@ const GroupsList: React.FC<{
         if (current) {
             navigate('/groups/' + current)
         } else {
-            if(window.location.pathname !== '/groups') {
-                navigate('/groups')   
-            }   
+            if (window.location.pathname !== '/groups') {
+                navigate('/groups')
+            }
         }
     }, [current, navigate])
 
@@ -95,7 +99,11 @@ const GroupsList: React.FC<{
     }
 
     const lookMembers = () => {
-        setDrawerVis(true)
+        setMemberVis(true)
+    }
+
+    const lookGroupInfo = () => {
+        setInfoVis(true)
     }
 
     const dissolveGroup = () => {
@@ -104,8 +112,8 @@ const GroupsList: React.FC<{
             maskClosable: true,
             onOk: () => {
                 socket.emit('dissolve group', operating.current?.gid, (err: any) => {
-                    console.log(err)
-                    if(!err) {
+                    // console.log(err)
+                    if (!err) {
                         message.success('解散群聊成功')
                     } else {
                         message.error('解散群聊失败')
@@ -121,7 +129,7 @@ const GroupsList: React.FC<{
         operating.current = group
     }, [])
 
-    
+
     return (
         <div className='group-list' id='group-list'>
             <ContextMenu>
@@ -129,7 +137,8 @@ const GroupsList: React.FC<{
                     { key: 0, label: '复制群id', onClick: copyGroupID },
                     { type: 'divider' },
                     { key: 1, label: '查看群成员', onClick: lookMembers },
-                    { key: 2, label: '解散该群', onClick: dissolveGroup }
+                    { key: 2, label: '查看群聊信息', onClick: lookGroupInfo },
+                    { key: 3, label: '解散该群', onClick: dissolveGroup, disabled: operating.current?.owner !== userInfo.uid }
                 ]} />
                 <List
                     dataSource={groups}
@@ -153,8 +162,11 @@ const GroupsList: React.FC<{
                 />
             </ContextMenu>
 
-            <Drawer title="所有群成员" placement="right" visible={drawerVis} onClose={() => setDrawerVis(false)} className='drawer'>
-                <GroupMember gid={operating.current?.gid} />
+            <Drawer title="所有群成员" placement="right" visible={memberVis} onClose={() => setMemberVis(false)} className='drawer'>
+                <GroupMemberContainer gid={operating.current?.gid} />
+            </Drawer>
+            <Drawer title="群聊信息" placement="right" visible={infoVis} onClose={() => setInfoVis(false)} className='drawer'>
+                <GroupInfoContainer gid={operating.current?.gid} />
             </Drawer>
         </div>
     )

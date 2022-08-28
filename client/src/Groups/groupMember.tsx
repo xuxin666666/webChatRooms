@@ -7,6 +7,7 @@ import ContextMenu from '../components/ContextMenu'
 import Image from '../components/Image'
 import { useUserInfo } from '../hooks'
 import { message } from '../pkg';
+import type { Dispatches } from './container/groupMemberContainer'
 import './scss/groupMember.scss'
 
 type GroupRole = 'owner' | 'admin' | 'normal'
@@ -55,7 +56,10 @@ const CustomPopconfirm: React.FC<CustomPopconfirmProps> = ({visible, title, chil
     </Popconfirm>
 )
 
-const GroupMember: React.FC<{gid?: string}> = ({ gid }) => {
+const GroupMember: React.FC<{
+    gid?: string
+    changeGroupInfo: Dispatches['changeGroupInfo']
+}> = ({ gid, changeGroupInfo }) => {
     const userInfo = useUserInfo()
 
     const [userRole, setUserRole] = useState<GroupRole>('normal')

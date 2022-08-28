@@ -6,7 +6,9 @@ import type { MenuProps } from 'antd'
 
 import './index.scss'
 
-
+interface HTMLDivItem extends HTMLDivElement {
+    able?: boolean
+}
 interface ContextMenuProps {
     children: React.ReactNode
 }
@@ -29,7 +31,7 @@ function assertIsNode(e: EventTarget | null): asserts e is Node { }
 // 创建context，保存数据
 const ContextMenuContext = createContext<{
     manual: React.MutableRefObject<boolean>
-    menuItems: React.MutableRefObject<HTMLDivElement[]>
+    menuItems: React.MutableRefObject<HTMLDivItem[]>
 }>({
     manual: { current: false }, // 是否人工
     menuItems: { current: [] }
@@ -61,19 +63,33 @@ const TheMenu: React.FC<TheMenuProps> = ({ items, defaultVisable = false, visibl
                 return
             }
 
-            let flag = 0
+            let flag = 0, flag2 = 0
             // 遍历子菜单项，判断是否包含点击位置
             for (let i = 0, len = menuItems.current.length; i < len; i++) {
                 if (menuItems.current[i]?.contains(e.target)) {
                     flag = 1
+                    if (menuItems.current[i].able) flag2 = 1
                     break
                 }
             }
             if (flag) {
                 e.preventDefault();
-                menuRef.current!.style.left = e.pageX + 'px'
-                menuRef.current!.style.top = e.pageY + 'px'
-                setVis(true)
+                if (flag2) {
+                    let width = menuRef.current!.offsetWidth,
+                        height = menuRef.current!.offsetHeight,
+                        screenWidth = document.documentElement.clientWidth,
+                        screenHeight = document.documentElement.clientHeight;
+
+                    if (e.pageX + width <= screenWidth) menuRef.current!.style.left = e.pageX + 'px'
+                    else menuRef.current!.style.left = (e.pageX - width) + 'px'
+
+                    if (e.pageY + height <= screenHeight) menuRef.current!.style.top = e.pageY + 'px'
+                    else menuRef.current!.style.top = (e.pageY - height) + 'px'
+
+                    setVis(true)
+                } else {
+                    setVis(false)
+                }
             } else {
                 setVis(false)
             }
@@ -101,7 +117,7 @@ const TheMenu: React.FC<TheMenuProps> = ({ items, defaultVisable = false, visibl
             {
                 createPortal((
                     <div ref={menuRef} className='contextMenu' style={{
-                        display: vis ? 'block' : 'none'
+                        visibility: vis ? 'visible' : 'hidden'
                     }}>
                         <Menu
                             mode='vertical'
@@ -118,7 +134,7 @@ const TheMenu: React.FC<TheMenuProps> = ({ items, defaultVisable = false, visibl
 // 把菜单显示部分分离出去，防止一些无用的重新渲染
 const ContextMenu: ContextMenuType<ContextMenuProps> = ({ children }) => {
 
-    const menuItems = useRef<HTMLDivElement[]>([]) // 记录子菜单项
+    const menuItems = useRef<HTMLDivItem[]>([]) // 记录子菜单项
     const manual = useRef(false) // 是否是人工操作
 
     return (
@@ -130,15 +146,16 @@ const ContextMenu: ContextMenuType<ContextMenuProps> = ({ children }) => {
 
 
 // 子菜单项，要触发菜单栏的项用该组件包裹起来
-const ContextMenuItem: React.FC<ContextMenuItemProps> = memo(({children, disabled = false}) => {
+const ContextMenuItem: React.FC<ContextMenuItemProps> = memo(({ children, disabled = false }) => {
     const { menuItems, manual } = useContext(ContextMenuContext)
 
-    const container = useRef<HTMLDivElement | null>(null)
+    const container = useRef<HTMLDivItem | null>(null)
 
     useEffect(() => {
         if (!disabled && !manual.current) {
-            menuItems.current.push(container.current!)
+            container.current!.able = true
         }
+        menuItems.current.push(container.current!)
     }, [manual.current, disabled])
 
     return (

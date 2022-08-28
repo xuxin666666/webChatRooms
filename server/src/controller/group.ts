@@ -96,7 +96,8 @@ const GChangeMemberRole = async (req: Request, res: Response) => {
 
 const GChangeAvatar = async (req: Request, res: Response) => {
     try {
-        let { gid } = req.body
+        let { files, fields } = await saveAvatar(req)
+        let uid = res.locals.uid, {gid} = fields, filename = (files.avatar as formidable.File).newFilename
 
         if (typeof gid !== 'string') {
             return res.status(412).send({
@@ -104,11 +105,14 @@ const GChangeAvatar = async (req: Request, res: Response) => {
             })
         }
 
-        let { files } = await saveAvatar(req)
-        let filename = (files.avatar as formidable.File).newFilename
+        let changeAble = (await PERMISSION.getGroupPermissionsByID(gid, uid)).GROUP_SET_INFO
+        if(!changeAble) {
+            return res.status(403).end()
+        }
 
         let [{ avatar }] = await mysql.GGetGroupInfo({ gid })
-        if (avatar && avatar !== 'defaultUser.png') {
+        console.log(avatar)
+        if (avatar && avatar !== 'defaultGroup.png') {
             // 删掉旧的头像文件
             let p = path.join(__dirname, '../../uploads/avatars', avatar)
             if (fs.existsSync(p)) fs.rmSync(p)
@@ -123,7 +127,7 @@ const GChangeAvatar = async (req: Request, res: Response) => {
 
 const GChangeBasicInfos = async (req: Request, res: Response) => {
     try {
-        let { name, description, gid } = req.body
+        let { name, description, gid } = req.body, uid = res.locals.uid
 
         if (
             !gid ||
@@ -134,7 +138,17 @@ const GChangeBasicInfos = async (req: Request, res: Response) => {
                 msg: '格式错误'
             })
         }
-        await mysql.GChangeGroupInfo(gid, { name, description })
+
+        let changeAble = (await PERMISSION.getGroupPermissionsByID(gid, uid)).GROUP_SET_INFO
+        if(!changeAble) {
+            return res.status(403).end()
+        }
+
+        let map: {[key: string]: any} = {}
+        if(name) map.name = name
+        if(description) map.description = description
+
+        await mysql.GChangeGroupInfo(gid, map)
 
         let info = await logic.GGetGroupInfo({ gid })
         res.json({
@@ -172,7 +186,7 @@ const GCreateGroup = async (req: Request, res: Response) => {
             gid,
             owner: uid
         })
-        await mysql.AUserJoinGroup(uid, gid, 'owner')
+        await mysql.AUserJoinGroup(uid, gid, GroupMemberRoles.owner)
 
         res.json({
             gid,
@@ -209,6 +223,23 @@ const GDeleteGroup = async (req: Request, res: Response) => {
 
         res.end()
     } catch (e) {
+        res.status(500).end()
+    }
+}
+
+const GGetGroupInfo = async (req: Request, res: Response) => {
+    try {
+        let { id: gid } = req.query
+
+        let [{avatar, owner, name, description}] = await mysql.GGetGroupInfo({gid: String(gid)})
+        let {id, username} = await mysql.AGetUserInfo({uid: owner})
+        res.json({
+            avatar: '/avatars/' + avatar,
+            owner: id,
+            ownerName: username,
+            name, description
+        })
+    } catch(err) {
         res.status(500).end()
     }
 }
@@ -262,5 +293,6 @@ export {
     GDeleteGroup,
     GSearchGroup,
     GJoinGroup,
-    GGetMembers
+    GGetMembers,
+    GGetGroupInfo
 }
