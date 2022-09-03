@@ -54,14 +54,13 @@ const ALogin = async (req: Request, res: Response) => {
 
         // 验证是否被封号
         if(blocked_time) {
-            return res.status(403).json({
+            return res.status(400).json({
                 status: 400,
-                msg: '您已被封号',
                 blocked_time
             })
         }
 
-        await mysql.AChangeUserInfo(uid, {last_online: Date.now()})
+        await logic.AUpdateLastOnline(uid)
 
         let token = JWT.generate({ uid })
         res.send({
@@ -84,7 +83,7 @@ const AAutoLogin = async (req:Request, res: Response) => {
         // 查询信息
         let {username, avatar, id, email, message_alert} = await mysql.AGetUserInfo({ uid })
         
-        await mysql.AChangeUserInfo(uid, {last_online: Date.now()})
+        await logic.AUpdateLastOnline(uid)
 
         res.json({
             username,
@@ -122,7 +121,8 @@ const ARegister = async (req: Request, res: Response) => {
             username,
             password,
             email,
-            uid: getUUID()
+            uid: getUUID(),
+            create_time: Date.now()
         })
 
         res.send({
@@ -338,25 +338,39 @@ const AProfile = async (req: Request, res: Response) => {
     }
 }
 
+const AGetUserRole = async (req: Request, res: Response) => {
+    try {
+        let uid = res.locals.uid as string
+
+        let {role} = await mysql.AGetUserInfo({uid})
+
+        res.send(role)
+    } catch(err) {
+        res.status(500).end()
+    }
+}
+
 const AChangeUserRole = async (req: Request, res: Response) => {
     try {
         let uid = res.locals.uid as string
-        let { uid: targetUid, role: targetRole } = req.body
+        let { uid: targetID, role: targetRole } = req.body
 
-        if(!targetUid || !PERMISSION.checkUserRoleParams(targetRole)) {
+        if(!Number.isInteger(targetID) || !PERMISSION.checkUserRoleParams(targetRole)) {
             return res.status(412).json({
                 msg: '参数有误'
             })
         }
+        
+        let {uid: targetUID} = await mysql.AGetUserInfo({id: targetID})
 
-        let able = await PERMISSION.canSetUserRole(uid, targetUid, targetRole)
+        let able = await PERMISSION.canSetUserRole(uid, targetUID, targetRole)
         
         if (!able) {
             return res.status(403).end()
         }
 
         // 修改被修改者的信息
-        await mysql.AChangeUserInfo(targetUid, { role: targetRole })
+        await mysql.AChangeUserInfo(targetUID, { role: targetRole })
 
         res.end()
     } catch {
@@ -367,9 +381,15 @@ const AChangeUserRole = async (req: Request, res: Response) => {
 const ABlockUser = async (req: Request, res: Response) => {
     try {
         let uid = res.locals.uid as string
-        let { uid: targetUid, time } = req.body
+        let { uid: targetID, time } = req.body
 
-        let success = await logic.ABlockUser(uid, targetUid, time)
+        if(!Number.isInteger(targetID) || !Number.isInteger(time) || time < 0) {
+            return res.status(412)
+        }
+
+        let {uid: targetUID} = await mysql.AGetUserInfo({id: targetID})
+
+        let success = await logic.ABlockUser(uid, targetUID, time)
 
         if (success) res.end()
         else res.status(403).end()
@@ -381,9 +401,15 @@ const ABlockUser = async (req: Request, res: Response) => {
 const AUnBlockUser = async (req: Request, res: Response) => {
     try {
         let uid = res.locals.uid as string
-        let { uid: targetUid } = req.body
+        let { uid: targetID } = req.body
 
-        let success = await logic.AUnBlockUser(uid, 'admin', targetUid)
+        if(!Number.isInteger(targetID)) {
+            return res.status(412)
+        }
+
+        let {uid: targetUID} = await mysql.AGetUserInfo({id: targetID})
+
+        let success = await logic.AUnBlockUser(uid, targetUID)
 
         if (success) res.end()
         else res.status(403).end()
@@ -476,6 +502,94 @@ const AMessageSystem = async (req: Request, res: Response) => {
     }
 }
 
+const AFilterUsers = async (req: Request, res: Response) => {
+    try {
+        let uid = res.locals.uid, 
+            {block, order, role, page} = req.body
+
+        let able = (await PERMISSION.getUserPermissionsByID(uid)).USER_VIEW_USERS
+        if(!able) return res.status(403).end()
+
+        if(!Array.isArray(block)
+            || !Array.isArray(role) 
+            || ![1, -1].includes(order)
+            || !(Number.isInteger(page) && page >= 0)
+        ) {
+            return res.status(412).end()
+        }
+
+        let [users, total] = await logic.AFilterUsers({block, order, role}, page)
+
+        res.json({
+            users: users.map(item => ({
+                uid: item.id,
+                username: item.username,
+                email: item.email,
+                avatar: '/avatars/' + item.avatar,
+                role: item.role,
+                last_online: item.last_online,
+                create_time: item.create_time,
+                blocked_time: item.blocked_time
+            })),
+            total
+        })
+    } catch(err) {
+        res.status(500).end()
+    }
+}
+
+const ADeleteAvatar = async (req: Request, res: Response) => {
+    try {
+        let uid = res.locals.uid
+        let {uid: targetID} = req.body
+
+        if(!Number.isInteger(targetID)) {
+            return res.status(412)
+        }
+
+        let {uid: targetUID} = await mysql.AGetUserInfo({id: targetID})
+
+        let able = (await PERMISSION.getUserPermissionsByID(uid, targetUID)).USER_DELETE_AVATAR
+        if(!able) {
+            return res.status(403).end()
+        }
+
+        let { avatar } = await mysql.AGetUserInfo({ uid: targetUID })
+        if (avatar && avatar !== 'defaultUser.png') {
+            // 删掉旧的头像文件
+            let p = path.join(__dirname, '../../uploads/avatars', avatar)
+            if (fs.existsSync(p)) fs.rmSync(p)
+        }
+
+        await mysql.AChangeUserInfo(targetUID, {avatar: 'defaultUser.png'})
+
+        res.send('/avatars/defaultUser.png')
+    } catch(err) {
+        res.status(500).end()
+    }
+}
+
+const ASearchUser = async (req: Request, res: Response) => {
+    try {
+        let {uid} = req.query
+
+        let info = await mysql.AGetUserInfo({id: Number(uid)})
+
+        res.json({
+            uid: info.id,
+            username: info.username,
+            email: info.email,
+            avatar: '/avatars/' + info.avatar,
+            role: info.role,
+            last_online: info.last_online,
+            create_time: info.create_time,
+            blocked_time: info.blocked_time
+        })
+    } catch(err) {
+        res.status(500).end()
+    }
+}
+
 export {
     ALogin,
     AAutoLogin,
@@ -494,5 +608,9 @@ export {
     AGetOtherMessage,
     AMessageAlert,
     AMessageSystem,
-    AChangeEmail
+    AChangeEmail,
+    AGetUserRole,
+    AFilterUsers,
+    ADeleteAvatar,
+    ASearchUser
 }

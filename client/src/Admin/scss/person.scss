@@ -1,0 +1,165 @@
+.adminPerson {
+    .lineBtn {
+        display       : flex;
+        flex-direction: row-reverse;
+        width         : 100%;
+
+        .btn {
+            color       : var(--font-color);
+            border-color: var(--second-color);
+
+            span {
+                color: inherit;
+            }
+
+            &:active,
+            &:hover,
+            &:focus {
+                background-color: var(--back-color2);
+                color           : var(--main-color);
+            }
+        }
+    }
+
+    .inputSearch {
+        margin-bottom: 20px;
+    }
+
+    .contentGrid {
+        padding              : 20px;
+        // display        : flex;
+        // flex-wrap      : wrap;
+        // justify-content: space-around;
+        display              : grid;
+        grid-template-columns: repeat(auto-fill, 400px);
+        column-gap           : 30px;
+        justify-content      : center;
+    }
+
+    .contentFlex {
+        display: flex;
+        justify-content: center;
+    }
+
+    .userCard {
+        display         : flex;
+        margin          : 10px;
+        padding         : 10px;
+        border          : 1px solid var(--second-color);
+        border-radius   : 10px;
+        // width        : 45%;
+        height          : 180px;
+        min-width       : 400px;
+        overflow        : hidden;
+        transition      : 0.3s all ease;
+
+        &:hover {
+            // transform: scale(1.02);
+            box-shadow: 0 0 6px 2px var(--second-color);
+        }
+
+        .left {
+            display       : flex;
+            flex-direction: column;
+            align-items   : center;
+            width         : 120px;
+            padding       : 0 5px;
+
+            .avatar {
+                width        : 96px;
+                height       : 96px;
+                border-radius: 5px;
+                margin-bottom: 5px;
+            }
+
+            .role {
+                margin: 5px 0 0;
+            }
+        }
+
+        .right {
+            display        : flex;
+            flex-direction : column;
+            justify-content: space-between;
+            line-height    : 24px;
+            margin-left    : 10px;
+            width          : calc(100% - 120px);
+
+            .top {
+
+                div,
+                span {
+                    text-overflow: ellipsis;
+                    overflow     : hidden;
+                    white-space  : nowrap;
+                }
+            }
+
+            .bottom {
+                display        : flex;
+                justify-content: flex-end;
+
+                .danger {
+                    margin          : 5px 5px 0;
+                    border          : 2px solid red;
+                    border-radius   : 5px;
+                    color           : red;
+                    font-weight     : 600;
+                    opacity         : 0.5;
+                    background-color: transparent;
+                    cursor          : pointer;
+
+                    &:hover {
+                        opacity: 0.9;
+                    }
+                }
+            }
+        }
+
+    }
+
+    .pgi {
+        display        : flex;
+        justify-content: center;
+        width          : 100%;
+    }
+
+}
+
+.userCard-selectTime {
+
+    // width: 540px;
+    .times {
+        display        : flex;
+        flex-wrap      : wrap;
+        justify-content: space-around;
+        border-bottom  : 1px solid var(--second-color);
+        padding-bottom : 10px;
+
+        span {
+            display    : block;
+            width      : 30%;
+            line-height: 28px;
+            text-align : center;
+            cursor     : pointer;
+
+            &:hover {
+                font-size: 1.2em;
+                color    : var(--main-color);
+            }
+        }
+    }
+
+    .custom {
+        margin-top    : 10px;
+        display       : flex;
+        flex-direction: row;
+
+        .input {
+            width : 70px;
+            margin: 5px 5px;
+        }
+    }
+
+
+}

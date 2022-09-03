@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
-import { SolutionOutlined } from '@ant-design/icons';
+import { IdcardOutlined } from '@ant-design/icons';
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import type {MenuProps} from 'antd'
 
@@ -46,7 +46,7 @@ const Personal: React.FC = () => {
         { 
             key: 'profile', 
             label: <Link to='/person/profile'>个人资料</Link>, 
-            icon: <SolutionOutlined /> 
+            icon: <IdcardOutlined />
         },
         { 
             key: 'account', 
@@ -72,11 +72,11 @@ const Personal: React.FC = () => {
     ]
 
     return (
-        <Layout className='personal'>
+        <Layout className='personal layout'>
             <Header>
                 <Link to='/groups'>聊天</Link>
             </Header>
-            <Layout className='body'>
+            <Layout className='body layout'>
                 <Sider breakpoint='md'>
                     <Menu
                         mode='inline'

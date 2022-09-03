@@ -84,7 +84,7 @@ const JoinGroup: React.FC<{
                 footer={false}
             >
                 <Input.Search
-                    className='join-search'
+                    className='inputSearch'
                     placeholder='请输入群的id号'
                     allowClear
                     onSearch={onSearch}

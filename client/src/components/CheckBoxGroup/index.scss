@@ -1,0 +1,23 @@
+.checkBoxGroup {
+    display  : flex;
+    flex-wrap: nowrap;
+    margin-bottom: 15px;
+
+    &.vertical {
+        align-items: center;
+
+        .checks {
+            margin-left: 10px;
+        }
+    }
+
+    &.horizontal {
+        flex-direction: column;
+
+        .divider {
+            width    : 50%;
+            min-width: 20px;
+            margin   : 5px 0 10px;
+        }
+    }
+}

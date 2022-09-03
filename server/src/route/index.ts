@@ -70,6 +70,8 @@ function routers(app: Express) {
         // 登录状态认证
         auth.use(authHttp)
         auth.get('/auto', controller.AAutoLogin)
+        auth.get('/role', controller.AGetUserRole)
+        auth.get('/search', controller.ASearchUser)
         auth.get('/messageStatus', controller.AGetMessageStatus)
         auth.post('/messageAlert', controller.AMessageAlert)
         auth.post('/messageSystem', controller.AMessageSystem)
@@ -82,6 +84,8 @@ function routers(app: Express) {
         auth.post('/changeRole', controller.AChangeUserRole)
         auth.post('/blockUser', controller.ABlockUser)
         auth.post('/unBlockUser', controller.AUnBlockUser)
+        auth.post('/filter', controller.AFilterUsers)
+        auth.delete('/avatar', controller.ADeleteAvatar)
     }
     app.use('/auth', auth)
 
@@ -102,6 +106,7 @@ function routers(app: Express) {
         group.post('/changeInfo', controller.GChangeBasicInfos)
         group.post('/join', controller.GJoinGroup)
         group.delete('/', controller.GDeleteGroup)
+        group.delete('/avatar', controller.GDeleteAvatar)
     }
     app.use('/group', group)
 

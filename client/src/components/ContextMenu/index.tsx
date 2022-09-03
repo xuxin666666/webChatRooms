@@ -51,7 +51,7 @@ const TheMenu: React.FC<TheMenuProps> = ({ items, defaultVisable = false, visibl
             manual.current = true
             mm.current = true
         }
-    }, [visible])
+    }, [visible, manual])
 
     // 监听右键事件，控制菜单栏的位置和菜单栏的展示（如果不为人工）
     useEffect(() => {
@@ -110,7 +110,7 @@ const TheMenu: React.FC<TheMenuProps> = ({ items, defaultVisable = false, visibl
         return () => {
             window.removeEventListener('click', winClick)
         }
-    })
+    }, [])
 
     return (
         <>

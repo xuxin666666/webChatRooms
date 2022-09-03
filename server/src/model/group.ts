@@ -10,6 +10,7 @@ export interface GroupGetGroups {
 interface GroupInitInfo {
     id: number;
     max_num: number;    // 管理员最大人数
+    create_time: number;
     gid: string;
     name: string;
     description: string;
@@ -18,11 +19,11 @@ interface GroupInitInfo {
 }
 
 export interface GroupSqlInfo extends GroupInitInfo {
-    admins: string;
+    // admins: string;
 }
 
 export interface GroupInfo extends GroupInitInfo {
-    admins: string[];
+    // admins: string[];
     read?: boolean;
 }
 
@@ -33,6 +34,7 @@ export interface GroupChangeInfo {
 }
 
 export interface GroupCreate {
+    create_time: number;
     gid: string;
     name: string;
     description: string;

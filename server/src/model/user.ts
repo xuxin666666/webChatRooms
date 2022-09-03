@@ -29,6 +29,7 @@ export interface UserInfo extends UserChangeInfo {
     password: string;
     email: string;
     uid: string;
+    create_time: number;
     id?: number;
 }
 
@@ -41,8 +42,6 @@ export interface UserGetInfo {
     role?: UserRole;
 }
 
-// export type UserRoles = 'normal' | 'admin' | 'topAdmin';
-
 export interface UserRegister {
     username: string;
     password: string;
@@ -54,15 +53,3 @@ export interface UserLogin {
     email: string;
     password: string;
 }
-
-// export enum UserRolesNumber {
-//     normal,
-//     admin,
-//     topAdmin
-// }
-
-// export enum UserRoles {
-//     normal = 'normal',
-//     admin = 'admin',
-//     topAdmin = 'topAdmin'
-// }

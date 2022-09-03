@@ -158,7 +158,6 @@ const GChangeBasicInfos = async (req: Request, res: Response) => {
             name: info.name,
             description: info.description,
             owner: info.owner,
-            admins: info.admins
         })
     } catch {
         res.status(500).end()
@@ -184,7 +183,8 @@ const GCreateGroup = async (req: Request, res: Response) => {
             name,
             description,
             gid,
-            owner: uid
+            owner: uid,
+            create_time: Date.now()
         })
         await mysql.AUserJoinGroup(uid, gid, GroupMemberRoles.owner)
 
@@ -283,6 +283,34 @@ const GJoinGroup = async (req: Request, res: Response) => {
     }
 }
 
+const GDeleteAvatar = async (req: Request, res: Response) => {
+    try {
+        let uid = res.locals.uid
+        let {gid} = req.body
+
+        let able = (await PERMISSION.getUserPermissionsByID(uid)).GROUP_DELETE_AVATAR
+        if(!able) {
+            able = (await PERMISSION.getGroupPermissionsByID(gid, uid)).GROUP_DELETE_AVATAR
+            if(!able) {
+                return res.status(403).end()
+            }
+        }
+
+        let [{ avatar }] = await mysql.GGetGroupInfo({ gid })
+        if (avatar && avatar !== 'defaultGroup.png') {
+            // 删掉旧的头像文件
+            let p = path.join(__dirname, '../../uploads/avatars', avatar)
+            if (fs.existsSync(p)) fs.rmSync(p)
+        }
+
+        await mysql.GChangeGroupInfo(gid, {avatar: 'defaultGroup.png'})
+
+        res.send('/avatars/defaultGroup.png')
+    } catch(err) {
+        res.status(500).end()
+    }
+}
+
 export {
     GGetMessages,
     GGetGroups,
@@ -294,5 +322,6 @@ export {
     GSearchGroup,
     GJoinGroup,
     GGetMembers,
-    GGetGroupInfo
+    GGetGroupInfo,
+    GDeleteAvatar
 }

@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, createContext, useEffect } from 'react'
+import React, { lazy, Suspense, createContext, useEffect, useRef, useState } from 'react'
 import { Spin, ConfigProvider } from 'antd'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import axios from 'axios'
@@ -8,6 +8,7 @@ import zhCN from 'antd/es/locale/zh_CN';
 import { useTheme } from '../hooks'
 import { message } from '../pkg';
 import Portals from '../components/Portals'
+import ScrollBar from './scrollBar'
 
 import './scss/index.scss'
 
@@ -38,7 +39,8 @@ const App = () => {
     return (
         <Context.Provider value={{ changeTheme, theme }}>
             <ConfigProvider locale={zhCN}>
-                <div className='app'>
+                <div className='app' >
+                    <ScrollBar />
                     <BrowserRouter>
                         <Suspense fallback={
                             <Portals>

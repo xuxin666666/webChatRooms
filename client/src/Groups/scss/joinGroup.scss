@@ -1,29 +1,4 @@
 .join-group-modal {
-    .join-search {
-        .ant-input-wrapper {
-            .ant-input-affix-wrapper {
-                &, &:hover, &:focus {
-                    background-color: var(--back-color2);
-                }
-            }
-        }
-        input.ant-input {
-            color: var(--font-color);
-            background-color: var(--back-color2);
-        }
-        .ant-input-affix-wrapper {
-            border-color: var(--second-color);
-        }
-        .ant-input-suffix {
-            .ant-input-clear-icon {
-                color: var(--font-color);
-            }
-        }
-        .anticon.anticon-search {
-            color: var(--font-color);
-        }
-    }
-
     .des {
         height: 240px;
         margin-top: 20px;

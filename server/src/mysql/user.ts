@@ -6,7 +6,7 @@ import { connPool, transaction, runInOrder } from './setup'
  * 检查用户是否存在
  * @param userInfo 至少包含username或email
  */
-const ACheckUserExist = (userInfo: UserGetInfo) => new Promise((
+export const ACheckUserExist = (userInfo: UserGetInfo) => new Promise((
     resolve: (exist: boolean) => void,
     reject
 ) => {
@@ -41,7 +41,7 @@ const ACheckUserExist = (userInfo: UserGetInfo) => new Promise((
     }
     ```
  */
-const ACreateUser = (userInfo: UserInfo) => new Promise((
+export const ACreateUser = (userInfo: UserInfo) => new Promise((
     resolve,
     reject
 ) => {
@@ -92,9 +92,9 @@ const ACreateUser = (userInfo: UserInfo) => new Promise((
 /**
  * 根据用户信息获取用户的全部信息
  * @param userInfo 用户的部分信息
- * @returns 可能多个用户，`[{uid, username, ...}, {...}, ...]`
+ * @returns 单个用户的信息
  */
-const AGetUserInfo = (userInfo: UserGetInfo) => new Promise((
+export const AGetUserInfo = (userInfo: UserGetInfo) => new Promise((
     resolve: (users: UserInfo) => void,
     reject
 ) => {
@@ -124,7 +124,7 @@ const AGetUserInfo = (userInfo: UserGetInfo) => new Promise((
  * 获取用户的某个群的未读消息的状态
  * 0: 未读，1: 已读
  */
-const AGetGroupReadStatus = (uid: string, gid: string) => new Promise((
+export const AGetGroupReadStatus = (uid: string, gid: string) => new Promise((
     resolve: (read: number) => void,
     reject
 ) => {
@@ -140,7 +140,7 @@ const AGetGroupReadStatus = (uid: string, gid: string) => new Promise((
     })
 })
 
-const AUserGetJoinedGroup = (uid: string) => new Promise((
+export const AUserGetJoinedGroup = (uid: string) => new Promise((
     resolve: (gids: string[]) => void,
     reject
 ) => {
@@ -172,7 +172,7 @@ const AUserGetJoinedGroup = (uid: string) => new Promise((
   }
  * ```
  */
-const AUserJoinGroup = (uid: string, gid: string, role: GroupMemberRole = 'normal') => new Promise((
+export const AUserJoinGroup = (uid: string, gid: string, role: GroupMemberRole = 'normal') => new Promise((
     resolve,
     reject
 ) => {
@@ -206,7 +206,7 @@ const AUserJoinGroup = (uid: string, gid: string, role: GroupMemberRole = 'norma
   }
  * ```
  */
-const AUserExitGroup = (uid: string, gid: string) => new Promise((
+export const AUserExitGroup = (uid: string, gid: string) => new Promise((
     resolve,
     reject
 ) => {
@@ -240,7 +240,7 @@ const AUserExitGroup = (uid: string, gid: string) => new Promise((
   }
  * ```
  */
-const AChangeGroupReadStatus = (uid: string, gid: string, read: number) => new Promise((
+export const AChangeGroupReadStatus = (uid: string, gid: string, read: number) => new Promise((
     resolve,
     reject
 ) => {
@@ -268,7 +268,7 @@ const AChangeGroupReadStatus = (uid: string, gid: string, read: number) => new P
   }
  * ```
  */
-const AChangeUserInfo = (uid: string, info: UserChangeInfo) => new Promise((
+export const AChangeUserInfo = (uid: string, info: UserChangeInfo) => new Promise((
     resolve,
     reject
 ) => {
@@ -305,7 +305,7 @@ const AChangeUserInfo = (uid: string, info: UserChangeInfo) => new Promise((
  * @param nums 选取消息的数量
  * @returns 
  */
-const AGetSystemMessage = (start: number | string, nums: number = 10) => new Promise((
+export const AGetSystemMessage = (start: number | string, nums: number = 10) => new Promise((
     resolve: (
         messages: {
             message: string,
@@ -333,7 +333,7 @@ const AGetSystemMessage = (start: number | string, nums: number = 10) => new Pro
  * @param nums 选取消息的数量
  * @returns 
  */
-const AGetOtherMessage = (uid: string, start: number | string, nums: number = 10) => new Promise((
+export const AGetOtherMessage = (uid: string, start: number | string, nums: number = 10) => new Promise((
     resolve: (
         messages: {
             message: string,
@@ -353,18 +353,44 @@ const AGetOtherMessage = (uid: string, start: number | string, nums: number = 10
     })
 })
 
+const options = ['block', 'role']
+export const AGetAndFilterUsers = (conditions: {[key: string]: string}, page: number, pageSize: number) => new Promise<UserInfo[]>((resolve, reject) => {
+    let sql = 'select * from users', opts: string[] = []
+    options.forEach(item => {
+        if(conditions[item]) opts.push(conditions[item])
+    })
 
+    if(opts.length) {
+        sql += ' where ' + opts.join(' and ')
+    }
+    sql += ' ' + conditions.order + ' limit ?,?'
 
-export {
-    ACheckUserExist,
-    ACreateUser,
-    AGetUserInfo,
-    AGetGroupReadStatus,
-    AUserGetJoinedGroup,
-    AUserJoinGroup,
-    AUserExitGroup,
-    AChangeUserInfo,
-    AChangeGroupReadStatus,
-    AGetSystemMessage,
-    AGetOtherMessage
-}
+    connPool.execute(
+        sql,
+        [page * pageSize, pageSize]
+    ).then(([users]) => {
+        resolve((users as UserInfo[]))
+    }).catch(err => {
+        console.logger('AGetAndFilterUsers: ', err)
+        reject(err)
+    })
+})
+
+export const AGetUsersNum = (conditions: {[key: string]: string}) => new Promise<number>((resolve, reject) => {
+    let sql = 'select count(*) from users', opts: string[] = []
+    options.forEach(item => {
+        if(conditions[item]) opts.push(conditions[item])
+    })
+
+    if(opts.length) {
+        sql += ' where ' + opts.join(' and ')
+    }
+
+    connPool.execute(sql).then(([res]) => {
+        // res[0]['count(*)'], 查询到的数量
+        resolve((res as any)[0]['count(*)'])
+    }).catch((err) => {
+        console.logger('AGetUsersNum', err)
+        reject(err)
+    })
+})

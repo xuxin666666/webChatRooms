@@ -26,6 +26,7 @@ async function main() {
 
     const { GAddMember, GCreateGroup, GDeleteGroup } = require('./mysql/group')
     const {ACreateUser} = require('./mysql/user')
+    const {default: getUUID} = require('./pkg/uuid')
 
     async function a() {
         // let res = await GJoinGroup('qwert', '123321')
@@ -33,8 +34,18 @@ async function main() {
         // let res = await GCreateGroup('dasdv', '123321', 'group1')
         // res = await GAddMember('qwert', '123321')
 
-        let res = await ACheckUserExist({username: 'admin'})
-        console.log(res)
+        // let res = await ACheckUserExist({username: 'admin'})
+        // console.log(res)
+        
+        // for(let i = 4; i < 100; i++) {
+        //     ACreateUser({
+        //         username: 'test' + i,
+        //         password: 12345678,
+        //         email: Math.random().toFixed(6) + '@qq.com',
+        //         uid: getUUID(),
+        //         create_time: Date.now() - Math.floor(86400 * 1000 * 10 * Math.random())
+        //     })
+        // }
     }
     // a()
 }

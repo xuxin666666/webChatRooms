@@ -42,25 +42,22 @@ const CONFIG = {
         )
         axios.interceptors.response.use(
             response => {
-                if (response.data.status === 430) {
-                    store.set('login', false)
-                    message.error('登录状态失效，请重新登录')
-                }
                 return response
             },
             error => {
                 const code = error.response && error.response.status;
                 if (code === 400) {
-                    let { msg, blocked_time } = error.response.data
-                    message.error(`${msg}，${timeCountDown(blocked_time)}后解封`)
-                }
-                if (code === 401) {
+                    let { blocked_time } = error.response.data
+                    message.error(`您已被封号，${timeCountDown(blocked_time - Date.now())}后解封`, 5)
+                    if (window.location.pathname !== '/') {
+                        window.location.pathname = '/'
+                    }
+                } else if (code === 401) {
                     if (window.location.pathname !== '/') {
                         message.warn('登录信息失效，请重新登录')
                         window.location.pathname = '/'
                     }
-                }
-                return Promise.reject(error)
+                } else return Promise.reject(error)
             }
         )
     },

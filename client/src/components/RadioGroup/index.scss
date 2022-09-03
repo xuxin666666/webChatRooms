@@ -1,0 +1,50 @@
+.radioGroup {
+    display  : flex;
+    flex-wrap: nowrap;
+    margin-bottom: 15px;
+
+    &.vertical {
+        align-items: center;
+
+        .checks {
+            margin-left: 10px;
+        }
+    }
+
+    &.horizontal {
+        flex-direction: column;
+
+        .divider {
+            width    : 50%;
+            min-width: 20px;
+            margin   : 5px 0 10px;
+        }
+    }
+
+    ::selection {
+        background: var(--main-color);
+    }
+}
+
+// .ant-checkbox-wrapper {
+//     color      : var(--font-color);
+//     white-space: nowrap;
+
+//     .ant-checkbox-checked .ant-checkbox-inner {
+//         background-color: var(--main-color);
+//         border: var(--main-color);
+//     }
+
+//     .ant-checkbox-indeterminate .ant-checkbox-inner:after {
+//         background-color: var(--main-color);
+//     }
+// }
+
+// .divider.ant-divider {
+//     border-color: var(--second-color);
+//     border-width: 2px;
+
+//     &.ant-divider-vertical {
+//         height: 1.3em;
+//     }
+// }

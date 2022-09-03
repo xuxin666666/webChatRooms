@@ -7,7 +7,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
     // 设置响应头
     res.header('Access-Control-Allow-Origin', origin)
     res.header('Access-Control-Allow-Headers', '*')
-    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE')
 
     // options方法直接放行
     if(req.method.toLowerCase() === 'options') {

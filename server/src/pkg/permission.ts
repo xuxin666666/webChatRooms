@@ -15,45 +15,51 @@ export enum GroupMemberRoles {
     normal = 'normal'
 }
 
-
-const USER_DELETE = 'user_delete',
-    USER_SET_BLOCK = 'user_set_block',
-    USER_SET_ADMIN = 'user_set_admin',
-    USER_SET_SENIOR_ADMIN = 'user_set_serior_admin',
-    GROUP_DELETE = 'group_delete',
-    GROUP_SET_OWNER = 'group_set_owner',
-    GROUP_SET_ADMIN = 'group_set_admin',
-    GROUP_KICK_MEMBER = 'group_kick_member',
-    GROUP_SET_INFO = 'group_set_info'
+const USER_DELETE = 1,
+    USER_SET_BLOCK = 2,
+    USER_SET_ADMIN = 3,
+    USER_SET_SENIOR_ADMIN = 4,
+    USER_VIEW_USERS = 5,
+    USER_DELETE_AVATAR = 6,
+    GROUP_DELETE = 100,
+    GROUP_SET_OWNER = 101,
+    GROUP_SET_ADMIN = 102,
+    GROUP_KICK_MEMBER = 103,
+    GROUP_SET_INFO = 104,
+    GROUP_DELETE_AVATAR = 105
 
 
 interface Permissions {
     LEVEL: number
-    USER_DELETE?: string
-    USER_SET_BLOCK?: string
-    USER_SET_ADMIN?: string
-    USER_SET_SENIOR_ADMIN?: string
-    GROUP_DELETE?: string
-    GROUP_SET_OWNER?: string
-    GROUP_SET_ADMIN?: string
-    GROUP_KICK_MEMBER?: string
-    GROUP_SET_INFO?: string
+    USER_DELETE?: number
+    USER_SET_BLOCK?: number
+    USER_SET_ADMIN?: number
+    USER_SET_SENIOR_ADMIN?: number
+    USER_VIEW_USERS?: number
+    USER_DELETE_AVATAR?: number
+    GROUP_DELETE?: number
+    GROUP_SET_OWNER?: number
+    GROUP_SET_ADMIN?: number
+    GROUP_KICK_MEMBER?: number
+    GROUP_SET_INFO?: number
+    GROUP_DELETE_AVATAR?: number
 }
+
 
 const User: {
     [T in UserRole]: Permissions
 } = {
     topAdmin: {
         LEVEL: 4,
-        USER_DELETE, USER_SET_BLOCK, USER_SET_ADMIN, USER_SET_SENIOR_ADMIN, GROUP_DELETE
+        USER_DELETE, USER_SET_BLOCK, USER_SET_ADMIN, USER_SET_SENIOR_ADMIN, GROUP_DELETE, USER_VIEW_USERS, USER_DELETE_AVATAR, GROUP_DELETE_AVATAR
     },
     seniorAdmin: {
         LEVEL: 3,
-        USER_DELETE, USER_SET_BLOCK, USER_SET_ADMIN, GROUP_DELETE
+        USER_DELETE, USER_SET_BLOCK, USER_SET_ADMIN, GROUP_DELETE, USER_VIEW_USERS, USER_DELETE_AVATAR, GROUP_DELETE_AVATAR
     },
     admin: {
         LEVEL: 2,
-        USER_SET_BLOCK
+        USER_SET_BLOCK, USER_VIEW_USERS, USER_DELETE_AVATAR, GROUP_DELETE_AVATAR
     },
     normal: {
         LEVEL: 1
@@ -64,7 +70,7 @@ const GROUP: {
 } = {
     owner: {
         LEVEL: 3,
-        GROUP_DELETE, GROUP_SET_OWNER, GROUP_SET_ADMIN, GROUP_KICK_MEMBER, GROUP_SET_INFO
+        GROUP_DELETE, GROUP_SET_OWNER, GROUP_SET_ADMIN, GROUP_KICK_MEMBER, GROUP_SET_INFO, GROUP_DELETE_AVATAR
     },
     admin: {
         LEVEL: 2,
@@ -76,12 +82,16 @@ const GROUP: {
 }
 
 const PERMISSION = {
-    getUserRole(uid: string) {
+    getUserRole(uid: string | number) {
+        let prop: any
+        if(typeof uid === 'string') prop = {uid}
+        else if(typeof uid === 'number') prop = {id: uid}
+
         return new Promise<UserRole>((resolve, reject) => {
-            mysql.AGetUserInfo({uid}).then((userInfo) => {
+            mysql.AGetUserInfo(prop).then((userInfo) => {
                 resolve(userInfo.role!)
             }).catch(err => {
-                console.logger('PERMISSION.getUserRole() failed, uid:', uid, ', Error:', err)
+                console.logger('PERMISSION.getUserRole() failed, uid/id:', uid, ', Error:', err)
                 reject(err)
             })
         })
@@ -97,7 +107,7 @@ const PERMISSION = {
             })
         })
     },
-    async getUserPermissionsByID(user: string, target?: string, limitRole?: UserRole, equal?: boolean) {
+    async getUserPermissionsByID(user: string | number, target?: string | number, limitRole?: UserRole, equal?: boolean) {
         try {
             let role = await this.getUserRole(user)
             if(target) {
@@ -134,8 +144,8 @@ const PERMISSION = {
             return {LEVEL: 1}
         }
         if (limitRole && (
-            (equal && (User[limitRole].LEVEL > User[limitRole].LEVEL)) ||
-            (!equal && User[limitRole].LEVEL >= User[limitRole].LEVEL)
+            (equal && (User[limitRole].LEVEL >= User[limitRole].LEVEL)) ||
+            (!equal && User[limitRole].LEVEL > User[limitRole].LEVEL)
         )) {
             return {LEVEL: 1}
         }
@@ -146,8 +156,8 @@ const PERMISSION = {
             return {LEVEL: 1}
         }
         if (limitRole && (
-            (equal && (GROUP[limitRole].LEVEL > GROUP[limitRole].LEVEL)) ||
-            (!equal && (GROUP[limitRole].LEVEL >= GROUP[limitRole].LEVEL))
+            (equal && (GROUP[limitRole].LEVEL >= GROUP[limitRole].LEVEL)) ||
+            (!equal && (GROUP[limitRole].LEVEL > GROUP[limitRole].LEVEL))
         )) {
             return {LEVEL: 1}
         }
@@ -167,7 +177,7 @@ const PERMISSION = {
     },
     async canSetUserRole(user: string, target: string, targetRole: UserRole) {
         try {
-            let able: string | undefined | boolean
+            let able: number | undefined | boolean
             if(targetRole === UserRoles.topAdmn) {
                 able = false
             } else if(targetRole === UserRoles.seniorAdmin) {
@@ -175,7 +185,7 @@ const PERMISSION = {
             } else if(targetRole === UserRoles.admin) {
                 able = (await this.getUserPermissionsByID(user, target)).USER_SET_ADMIN
             } else {
-                able = false
+                able = (await this.getUserPermissionsByID(user, target)).USER_SET_ADMIN
             }
             return Boolean(able)
         } catch(err) {
@@ -185,13 +195,13 @@ const PERMISSION = {
     },
     async canSetGroupRole(user: string, target: string, targetRole: GroupMemberRole) {
         try {
-            let able: string | undefined | boolean
+            let able: number | undefined | boolean
             if(targetRole === GroupMemberRoles.owner) {
                 able = (await this.getGroupPermissionsByID(user, target)).GROUP_SET_OWNER
             } else if(targetRole === GroupMemberRoles.admin) {
                 able = (await this.getGroupPermissionsByID(user, target)).GROUP_SET_ADMIN
             } else {
-                able = false
+                able = (await this.getGroupPermissionsByID(user, target)).GROUP_SET_ADMIN
             }
             return Boolean(able)
         } catch(err) {

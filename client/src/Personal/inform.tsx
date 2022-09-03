@@ -1,9 +1,11 @@
 import axios from 'axios'
 import store from 'store'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Card, message, Switch, Tooltip } from 'antd'
+import { Card, Switch, Tooltip } from 'antd'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import type { SwitchProps } from 'antd'
+
+import { message } from '../pkg'
 
 import './scss/inform.scss'
 
@@ -34,7 +36,7 @@ const Inform: React.FC = () => {
                 })
             })
             .catch(err => {
-                console.log(err)
+                // console.log(err)
                 message.error('设置失败')
             })
     }, [])
@@ -56,7 +58,7 @@ const Inform: React.FC = () => {
                     })
             } else reject('浏览器通知已禁止，请检查您的网站设置')
         }).then(sendChangeReq).catch((err) => {
-            message.warning(err)
+            message.warn(err)
         }).then(() => {
             setDisable(false)
         })

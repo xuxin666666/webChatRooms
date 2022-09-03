@@ -1,29 +1,48 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Space, Dropdown, Menu, Switch } from 'antd'
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons'
-import {useNavigate} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 import store from 'store'
+import axios from 'axios'
 
 import { Context } from '../../App'
 import useUserInfo from '../../hooks/useUserInfo'
 import Image from '../Image'
-import { SunLightOutLined, MoonNightOutlined, NotificationOutlined } from '../Icons'
+import { SunLightOutLined, MoonNightOutlined, NotificationOutlined, ManageOutlined } from '../Icons'
+import { message } from '../../pkg'
 
 import logo from '../../assert/images/logo.png'
 import './index.scss'
 
 
 
+
+type UserRole = 'topAdmin' | 'seniorAdmin' | 'admin' | 'normal'
+enum UserRoleWeight {
+    normal,
+    admin,
+    seniorAdmin,
+    topAdmin
+}
+
 const Header: React.FC<{
-    children: React.ReactNode
+    children?: React.ReactNode
 }> = ({ children }) => {
     const [visible, setVisible] = useState(false)
+    const [role, setRole] = useState<UserRole>('normal')
 
     const userInfo = useUserInfo()
 
     const { changeTheme, theme } = useContext(Context)
     const navigate = useNavigate()
 
+    useEffect(() => {
+        axios.get('/auth/role').then(({data}) => {
+            setRole(data)
+        }).catch(err => {
+            message.error('获取用户角色失败')
+        })
+    }, [])
 
     const handleVisibleChange = (vis: boolean) => {
         setVisible(vis);
@@ -85,6 +104,13 @@ const Header: React.FC<{
                 {children}
             </div>
             <Space direction='horizontal'>
+                {
+                    UserRoleWeight[role] > UserRoleWeight.normal && (
+                        <Link to='/admin'>
+                            <ManageOutlined className='header-icons' />
+                        </Link>
+                    )
+                }
                 <NotificationOutlined className='header-icons' />
                 <Dropdown trigger={['click']} overlay={menu} placement='bottomRight' onVisibleChange={handleVisibleChange} visible={visible}>
                     {avatar}

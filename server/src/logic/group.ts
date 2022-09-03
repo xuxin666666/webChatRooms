@@ -60,19 +60,16 @@ const GGetGroupInfo = (conditions: GroupGetGroups, uid?: string) => new Promise(
 ) => {
     mysql.GGetGroupInfo(conditions).then((groups) => {
         let info = groups[0]
-        let admins = info.admins ? info.admins.split(',') : []
         if (uid) {
             mysql.AGetGroupReadStatus(uid, info.gid).then((read) => {
                 resolve({
                     ...info,
-                    admins,
                     read: Boolean(read)
                 })
             })
         } else {
             resolve({
                 ...info,
-                admins
             })
         }
     }).catch(reject)
