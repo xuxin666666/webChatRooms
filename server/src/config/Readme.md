@@ -18,5 +18,17 @@
 }
 ```
 ### development.json
-
+```json
+{
+    "mysql": { // 数据库相关
+        "host": "",
+        "port": 0,
+        "user": "",
+        "password": "",
+        "charset": "",
+        "database": "",
+        "connectionLimit": 50 // 最大连接数
+    }
+}
+```
 ### production.json
